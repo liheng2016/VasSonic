@@ -14,8 +14,11 @@
 package com.tencent.sonic.sdk;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Environment;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
@@ -46,6 +49,10 @@ public abstract class SonicRuntime {
      */
     protected final Context context;
 
+    /**
+     * This handle thread use to save sonic cache.
+     */
+    protected volatile static HandlerThread fileHandlerThread;
 
     public SonicRuntime(Context context) {
         if (null == context) {
@@ -171,7 +178,7 @@ public abstract class SonicRuntime {
     public abstract String getCookie(String url);
 
     /**
-     * Det cookies to webview after session connection response with cookies in it's headers.
+     * Set cookies to webview after session connection response with cookies in it's headers.
      *
      * @param url The url which need to set cookies
      * @param cookies The cookies for current input url
@@ -181,7 +188,7 @@ public abstract class SonicRuntime {
 
     /**
      * Get user agent of current runtime, this method will be called before sonic session make a
-     * session connection to request data.(sonic sdk info such like "sonic-sdk-version/1.0" will
+     * session connection to request data.(sonic sdk info such like "sonic-sdk-version/2.0.0" will
      * be added to this user agent.)
      * @return The user agent
      */
@@ -201,6 +208,30 @@ public abstract class SonicRuntime {
             notifyError(null, path, SonicConstants.ERROR_CODE_MAKE_DIR_ERROR);
         }
         return file;
+    }
+
+    /**
+     * The resource cache root dir which resource cache will be storage.
+     * it's expected to be a dir in /sdcard dir for security.
+     *
+     * @return The root cache dir.
+     */
+    public File getSonicResourceCacheDir() {
+        File file = new File(Environment.getExternalStorageDirectory(), "/SonicResource/");
+        if (!file.exists() && !file.mkdir()) {
+            log(TAG, Log.ERROR, "getSonicResourceCacheDir error:make dir(" + file.getAbsolutePath() + ") fail!");
+            notifyError(null, file.getAbsolutePath(), SonicConstants.ERROR_CODE_MAKE_DIR_ERROR);
+        }
+        return file;
+    }
+
+    /**
+     * get SharedPreferences of sonic.
+     *
+     * @return the sp
+     */
+    public SharedPreferences getSonicSharedPreferences() {
+        return context.getSharedPreferences("sonic", Context.MODE_PRIVATE);
     }
 
     /**
@@ -297,6 +328,20 @@ public abstract class SonicRuntime {
     }
 
     /**
+     * Return the looper of HandleThread which use to save sonic cache.
+     *
+     * @return The looper of HandleThread which use to save sonic cache.
+     */
+    public Looper getFileThreadLooper() {
+        if (fileHandlerThread == null) {
+            fileHandlerThread = new HandlerThread("SonicSdk_FileThread");
+            fileHandlerThread.start();
+        }
+
+        return fileHandlerThread.getLooper();
+    }
+
+    /**
      * Notify error for host application to do report or statics
      *
      * @param client    The error client
@@ -304,13 +349,4 @@ public abstract class SonicRuntime {
      * @param errorCode Error code
      */
     public abstract void notifyError(SonicSessionClient client, String url, int errorCode);
-
-    /**
-     * Get headers provider to get headers for sonic session to do something.
-     *
-     * @return Return a provider
-     */
-    public SonicHeadersProvider getSonicHeadersProvider() {
-        return null;
-    }
 }

@@ -20,6 +20,7 @@
 #import "RootViewController.h"
 #import "SonicWebViewController.h"
 #import "SonicOfflineCacheConnection.h"
+#import "SonicEventObserver.h"
 
 @import Sonic;
 
@@ -38,6 +39,7 @@
         self.title = @"Sonic";
         
         self.url = @"http://mc.vip.qq.com/demo/indexv3";
+
     }
     return self;
 }
@@ -47,6 +49,10 @@
     
     //Subclass the SonicConnection to return offline cache
     [SonicSession registerSonicConnection:[SonicOfflineCacheConnection class]];
+    
+    //add event observer
+    SonicEventObserver *observer = [SonicEventObserver new];
+    [[SonicEventStatistics shareStatistics] addEventObserver:observer];
 
     //header
     UIImageView *header = [[UIImageView alloc]initWithImage:[UIImage imageNamed:@"header.png"]];
@@ -75,9 +81,11 @@
 {
     [self createButtonWithIndex:0 withTitle:@"LOAD WITHOUT SONIC" withAction:@selector(normalRequestAction)];
     [self createButtonWithIndex:1 withTitle:@"LOAD WITH SONIC" withAction:@selector(sonicRequestAction)];
-    [self createButtonWithIndex:2 withTitle:@"DO SONIC PRELOAD" withAction:@selector(sonicPreloadAction)];
-    [self createButtonWithIndex:3 withTitle:@"LOAD SONIC WITH OFFLINE CACHE" withAction:@selector(loadWithOfflineFileAction)];
-    [self createButtonWithIndex:4 withTitle:@"CLEAN UP CACHE" withAction:@selector(clearAllCacheAction)];
+    [self createButtonWithIndex:2 withTitle:@"LOAD WITH UNSTRICT SONIC" withAction:@selector(unstrictModeSonicRequestAction)];
+    [self createButtonWithIndex:3 withTitle:@"LOAD WITH RESOURCE PRELOAD" withAction:@selector(sonicResourcePreloadAction)];
+    [self createButtonWithIndex:4 withTitle:@"LOAD SONIC WITH OFFLINE CACHE" withAction:@selector(loadWithOfflineFileAction)];
+    [self createButtonWithIndex:5 withTitle:@"DO SONIC PRELOAD" withAction:@selector(sonicPreloadAction)];
+    [self createButtonWithIndex:6 withTitle:@"CLEAN UP CACHE" withAction:@selector(clearAllCacheAction)];
 }
 
 - (void)setupBottomLabel
@@ -94,7 +102,7 @@
 - (void)createButtonWithIndex:(NSInteger)index withTitle:(NSString *)title withAction:(SEL)action
 {
     CGFloat offsetX = SizeFitWidthPlus(12.f);
-    CGFloat rowMargin = SizeFitHeightPlus(20.f);
+    CGFloat rowMargin = SizeFitHeightPlus(13.f);
     CGFloat screenWidth = [UIScreen mainScreen].bounds.size.width;
     CGFloat buttonWidth = screenWidth - 2*offsetX;
     CGFloat buttonHeight = SizeFitHeightPlus(44.f);
@@ -129,31 +137,43 @@ static CGFloat SizeFitHeightPlus(CGFloat value)
 
 - (void)normalRequestAction
 {
-    SonicWebViewController *webVC = [[SonicWebViewController alloc]initWithUrl:self.url useSonicMode:NO];
+    SonicWebViewController *webVC = [[SonicWebViewController alloc]initWithUrl:self.url useSonicMode:NO unStrictMode:NO];
+    [self.navigationController pushViewController:webVC animated:YES];
+}
+
+- (void)sonicResourcePreloadAction
+{
+    SonicWebViewController *webVC = [[SonicWebViewController alloc]initWithUrl:@"http://www.kgc.cn/zhuanti/bigca.shtml?jump=1" useSonicMode:YES unStrictMode:YES];
     [self.navigationController pushViewController:webVC animated:YES];
 }
 
 - (void)sonicPreloadAction
 {
-    [[SonicClient sharedClient] createSessionWithUrl:self.url withWebDelegate:nil];
+    [[SonicEngine sharedEngine] createSessionWithUrl:self.url withWebDelegate:nil];
     [self alertMessage:@"Preload Start!"];
 }
 
 - (void)sonicRequestAction
 {
-    SonicWebViewController *webVC = [[SonicWebViewController alloc]initWithUrl:self.url useSonicMode:YES];
+    SonicWebViewController *webVC = [[SonicWebViewController alloc]initWithUrl:self.url useSonicMode:YES unStrictMode:NO];
+    [self.navigationController pushViewController:webVC animated:YES];
+}
+
+- (void)unstrictModeSonicRequestAction
+{
+    SonicWebViewController *webVC = [[SonicWebViewController alloc]initWithUrl:@"http://www.kgc.cn/zhuanti/bigca.shtml?jump=1" useSonicMode:YES unStrictMode:YES];
     [self.navigationController pushViewController:webVC animated:YES];
 }
 
 - (void)loadWithOfflineFileAction
 {
-    SonicWebViewController *webVC = [[SonicWebViewController alloc]initWithUrl:@"http://mc.vip.qq.com/demo/indexv3?offline=1" useSonicMode:YES];
+    SonicWebViewController *webVC = [[SonicWebViewController alloc]initWithUrl:@"http://mc.vip.qq.com/demo/indexv3?offline=1" useSonicMode:YES unStrictMode:NO];
     [self.navigationController pushViewController:webVC animated:YES];
 }
 
 - (void)clearAllCacheAction
 {
-    [[SonicClient sharedClient] clearAllCache];
+    [[SonicEngine sharedEngine] clearAllCache];
     [self alertMessage:@"Clear Success!"];
 }
 

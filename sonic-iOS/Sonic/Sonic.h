@@ -29,12 +29,15 @@ FOUNDATION_EXPORT const unsigned char SonicVersionString[];
 
 #import <Foundation/Foundation.h>
 
+#import "SonicConfiguration.h"
+#import "SonicSessionConfiguration.h"
 #import "SonicProtocol.h"
 #import "SonicConstants.h"
 #import "SonicSession.h"
-#import "SonicClient.h"
-#import "SonicUitil.h"
+#import "SonicEngine.h"
+#import "SonicUtil.h"
 #import "SonicConnection.h"
 #import "SonicURLProtocol.h"
 #import "SonicCache.h"
 #import "SonicCacheItem.h"
+#import "SonicEventStatistics.h"

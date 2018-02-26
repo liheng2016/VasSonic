@@ -56,7 +56,7 @@ typedef NS_ENUM(NSUInteger, SonicURLProtocolAction) {
     
     SonicURLProtocolActionRecvResponse,
     
-    SonicURLProtocolActionDidFinish,
+    SonicURLProtocolActionDidSuccess,
     
     SonicURLProtocolActionDidFaild,
 };
@@ -107,6 +107,11 @@ typedef NS_ENUM(NSInteger, SonicErrorType) {
 #define SonicHeaderValueWebviewLoad   @"__SONIC_HEADER_VALUE_WEBVIEW_LOAD__"
 
 /**
+ * The hash of Delegate which uses to identify wether it's owner of a SonicSession.
+ */
+#define SonicHeaderKeyDelegateId    @"sonic-delegate-id"
+
+/**
  * The request is started by SonicSession.
  */
 #define SonicHeaderValueSonicLoad @"__SONIC_HEADER_VALUE_SONIC_LOAD__"
@@ -122,30 +127,43 @@ typedef NS_ENUM(NSInteger, SonicErrorType) {
 #define SonicHeaderKeySDKVersion @"sonic-sdk-version"
 
 /**
- * Current sonic version: Sonic/1.0.
+ * Current sonic version: Sonic/2.0.0
  */
-#define SonicHeaderValueSDKVersion         @"Sonic/1.0"
+#define SonicHeaderValueSDKVersion @"Sonic/2.0.0"
 
 /**
  * Pass template tag through this field.
  */
 #define SonicHeaderKeyTemplate @"template-tag"
 
+#define SonicHeaderKeyHtmlSha1 @"html-sha1"
+
+/**
+ * Pass true/false to decide if template-change
+ */
+#define SonicHeaderKeyTemplateChange @"template-change"
+
+#define SonicHeaderKeyLink @"sonic-link"
+
 /**
  * Pass Etag through this field.
  */
-#define SonicHeaderKeyETag     @"Etag"
+#define SonicHeaderKeyETag     @"etag"
 
 /**
  * Content-Security-Policy key for header.
  */
-#define SonicHeaderKeyCSPHeader       @"Content-Security-Policy"
-
+#define SonicHeaderKeyCSPHeader       @"content-security-policy"
 
 /**
  * Pass cache policy through this field: SonicHeaderValueCacheOfflineStore, SonicHeaderValueCacheOfflineStoreRefresh, SonicHeaderValueCacheOfflineRefresh, SonicHeaderValueCacheOfflineDisable.
  */
 #define SonicHeaderKeyCacheOffline       @"cache-offline"
+
+/**
+ * Http header cache control policy
+ */
+#define SonicHeaderValueCacheControl  @"cache-control"
 
 /**
  * Store the new data and don't refresh web content.
@@ -179,6 +197,21 @@ typedef NS_ENUM(NSInteger, SonicErrorType) {
 #define kSonicLocalRefreshTime  @"local_refresh"
 
 /**
+ * The timestamp when the local cache expire
+ */
+#define kSonicLocalCacheExpireTime @"cache-expire-time"
+
+/**
+ * The http response header key Max-Age
+ */
+#define SonicHeaderMaxAge @"max-age"
+
+/**
+ * The http response header key Expires
+ */
+#define SonicHeaderExpire @"expires"
+
+/**
  * Html-SHA1
  */
 #define kSonicSha1          @"sha1"
@@ -198,12 +231,38 @@ typedef NS_ENUM(NSInteger, SonicErrorType) {
  */
 #define SonicCacheOfflineDisableList       @"cache-offline-disable.cfg"
 
-/**
- * Sever default disable sonic time duration: 6 hours.
- */
-#define SonicCacheOfflineDefaultTime   60*60*6
+#define SonicCacheDatabase @"sonic.db"
 
 /**
  * Quick way to get file manager.
  */
 #define SonicFileManager    [NSFileManager defaultManager]
+
+/**
+ * Sonic item field name
+ */
+#define kSonicHtmlFieldName                 @"html"
+#define kSonicTemplateFieldName             @"template"
+#define kSonicDataFieldName                 @"data"
+#define kSonicDiffFieldName                 @"diff"
+
+/**
+ * HTTP Header:If-None-Match
+ */
+#define HTTPHeaderKeyIfNoneMatch @"If-None-Match"
+
+/**
+ * HTTP Header:User-Agent
+ */
+#define HTTPHeaderKeyUserAgent @"User-Agent"
+
+/**
+ * HTTP Header:Host
+ */
+#define HTTPHeaderKeyHost @"Host"
+
+/**
+ * HTTP Header:Content-Type
+ */
+#define HTTPHeaderKeyContentType @"Content-Type"
+

@@ -13,7 +13,7 @@
 
 package com.tencent.sonic.sdk;
 
-import android.os.Build;
+import java.util.Map;
 
 /**
  *
@@ -67,6 +67,17 @@ public class SonicSessionConfig {
     boolean AUTO_START_WHEN_CREATE = true;
 
     /**
+     * Need to check the Cache-Control response header or not.
+     */
+    boolean SUPPORT_CACHE_CONTROL = false;
+
+    /**
+     * Use local Sonic Server or not. If SUPPORT_LOCAL_SERVER is true, Sonic will treat normal request as sonic request
+     * to separate html into template and data file.
+     */
+    boolean SUPPORT_LOCAL_SERVER = false;
+
+    /**
      * The toast when network unavailable
      */
     String USE_SONIC_CACHE_IN_BAD_NETWORK_TOAST = "Bad Network!";
@@ -86,10 +97,25 @@ public class SonicSessionConfig {
      */
     SonicSessionConnectionInterceptor connectionInterceptor = null;
 
+    /**
+     * The custom request headers which will be sent to web server
+     */
+    Map<String, String> customRequestHeaders = null;
+
+    /**
+     * The custom response headers which will be sent to webView for intercept WebResourceResponse
+     */
+    Map<String, String> customResponseHeaders = null;
 
     @Override
     public boolean equals(Object other) {
-        return other instanceof SonicSessionConfig && sessionMode == ((SonicSessionConfig) other).sessionMode;
+        if (other instanceof SonicSessionConfig) {
+            SonicSessionConfig config = (SonicSessionConfig)other;
+            return sessionMode == config.sessionMode && SUPPORT_LOCAL_SERVER == config.SUPPORT_LOCAL_SERVER;
+        }
+
+        return false;
+
     }
 
     private SonicSessionConfig() {
@@ -162,10 +188,31 @@ public class SonicSessionConfig {
             return this;
         }
 
-        public Builder setConnectionIntercepter(SonicSessionConnectionInterceptor intercepter) {
-            target.connectionInterceptor = intercepter;
+        public Builder setConnectionInterceptor(SonicSessionConnectionInterceptor interceptor) {
+            target.connectionInterceptor = interceptor;
             return this;
         }
+
+        public Builder setCustomRequestHeaders(Map<String, String> customRequestHeaders) {
+            target.customRequestHeaders = customRequestHeaders;
+            return this;
+        }
+
+        public Builder setCustomResponseHeaders(Map<String, String> customResponseHeaders) {
+            target.customResponseHeaders = customResponseHeaders;
+            return this;
+        }
+
+        public Builder setSupportCacheControl(boolean supportCacheControl) {
+            target.SUPPORT_CACHE_CONTROL = supportCacheControl;
+            return this;
+        }
+
+        public Builder setSupportLocalServer(boolean enable) {
+            target.SUPPORT_LOCAL_SERVER = enable;
+            return this;
+        }
+
 
         public SonicSessionConfig build() {
             return target;

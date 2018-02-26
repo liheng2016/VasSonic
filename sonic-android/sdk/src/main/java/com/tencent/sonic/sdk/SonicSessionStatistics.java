@@ -17,7 +17,7 @@ import java.net.HttpURLConnection;
 
 
 /**
- * The Statistic model specifies the data models which are requried to be used to provide
+ * The Statistic model specifies the data models which are required to be used to provide
  * the performance data described by the specific attributes in a SonicSession.
  */
 public class SonicSessionStatistics {
@@ -43,7 +43,7 @@ public class SonicSessionStatistics {
     public long sonicStartTime;
 
     /**
-     * Sonic flow start{@link SonicSession#runSonicFlow()} time
+     * Sonic flow start{@link SonicSession#runSonicFlow(boolean)} time
      */
     public long sonicFlowStartTime;
 
@@ -76,4 +76,11 @@ public class SonicSessionStatistics {
      * Is IP direct
      */
     public boolean isDirectAddress;
+
+
+    /**
+     * The time when website try get diff data.
+     */
+    public long diffDataCallbackTime;
+
 }

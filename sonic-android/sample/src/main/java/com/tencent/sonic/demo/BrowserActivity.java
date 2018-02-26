@@ -18,13 +18,16 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.text.TextUtils;
+import android.view.View;
 import android.view.WindowManager;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
 
 import com.tencent.sonic.R;
 import com.tencent.sonic.sdk.SonicCacheInterceptor;
@@ -85,6 +88,7 @@ public class BrowserActivity extends Activity {
         // if it's sonic mode , startup sonic session at first time
         if (MainActivity.MODE_DEFAULT != mode) { // sonic mode
             SonicSessionConfig.Builder sessionConfigBuilder = new SonicSessionConfig.Builder();
+            sessionConfigBuilder.setSupportLocalServer(true);
 
             // if it's offline pkg mode, we need to intercept the session connection
             if (MainActivity.MODE_SONIC_WITH_OFFLINE_CACHE == mode) {
@@ -95,7 +99,7 @@ public class BrowserActivity extends Activity {
                     }
                 });
 
-                sessionConfigBuilder.setConnectionIntercepter(new SonicSessionConnectionInterceptor() {
+                sessionConfigBuilder.setConnectionInterceptor(new SonicSessionConnectionInterceptor() {
                     @Override
                     public SonicSessionConnection getConnection(SonicSession session, Intent intent) {
                         return new OfflinePkgSessionConnection(BrowserActivity.this, session, intent);
@@ -110,7 +114,8 @@ public class BrowserActivity extends Activity {
             } else {
                 // this only happen when a same sonic session is already running,
                 // u can comment following codes to feedback as a default mode.
-                throw new UnknownError("create session fail!");
+                // throw new UnknownError("create session fail!");
+                Toast.makeText(this, "create sonic session fail!", Toast.LENGTH_LONG).show();
             }
         }
 
@@ -118,6 +123,16 @@ public class BrowserActivity extends Activity {
         // in the real world, the init flow may cost a long time as startup
         // runtime、init configs....
         setContentView(R.layout.activity_browser);
+
+        FloatingActionButton btnFab = (FloatingActionButton) findViewById(R.id.btn_refresh);
+        btnFab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (sonicSession != null) {
+                    sonicSession.refresh();
+                }
+            }
+        });
 
         // init webview
         WebView webView = (WebView) findViewById(R.id.webview);
